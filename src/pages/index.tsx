@@ -4,7 +4,6 @@ import { ExternalLink, Linkedin, Mail, MessageSquare, Play, ArrowUpRight, CheckC
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import SplitType from 'split-type';
-import { supabase } from '../lib/supabaseClient';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -171,25 +170,27 @@ export default function Home() {
     setStatus('idle');
 
     try {
-      const { error } = await supabase
-        .from('contacts')
-        .insert([
-          {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            email: formData.email,
-            message: formData.message
-          }
-        ]);
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: process.env.NEXT_PUBLIC_WEB3FORMS_KEY || 'YOUR_WEB3FORMS_ACCESS_KEY',
+          name: `${formData.firstName} ${formData.lastName}`,
+          email: formData.email,
+          message: formData.message,
+          subject: 'New Inquiry from Blume Portfolio',
+        }),
+      });
 
-      if (!error) {
+      const result = await response.json();
+      if (result.success) {
         setStatus('success');
         setFormData({ firstName: '', lastName: '', email: '', message: '' });
       } else {
-        throw error;
+        throw new Error(result.message);
       }
     } catch (err) {
-      console.error('Supabase submission detail:', err);
+      console.error('Web3Forms submission detail:', err);
       setStatus('error');
     } finally {
       setIsSubmitting(false);
