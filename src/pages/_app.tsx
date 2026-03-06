@@ -33,7 +33,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
   return (
     <>
       <Head>
-        <title>Meteoric | Strategic Digital Architecture</title>
+        <title>Blume | Strategic Digital Architecture</title>
         <meta name="description" content="Premium digital agency specializing in high-performance web development and AI automation." />
       </Head>
       <AnimatePresence mode="wait">

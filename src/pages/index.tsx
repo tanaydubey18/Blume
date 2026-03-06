@@ -4,6 +4,7 @@ import { ExternalLink, Linkedin, Mail, MessageSquare, Play, ArrowUpRight, CheckC
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import SplitType from 'split-type';
+import { supabase } from '../lib/supabaseClient';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -125,7 +126,7 @@ const Preloader = () => {
       <div ref={panelRef} className="preloader-panel" />
       <div className="preloader-content">
         <div className="preloader-text">
-          {"METEORIC".split("").map((char, i) => (
+          {"BLUME".split("").map((char, i) => (
             <span key={i}>{char}</span>
           ))}
         </div>
@@ -170,27 +171,25 @@ export default function Home() {
     setStatus('idle');
 
     try {
-      const response = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({
-          access_key: process.env.NEXT_PUBLIC_WEB3FORMS_KEY || 'YOUR_WEB3FORMS_ACCESS_KEY',
-          name: `${formData.firstName} ${formData.lastName}`,
-          email: formData.email,
-          message: formData.message,
-          subject: 'New Inquiry from Meteoric Portfolio',
-        }),
-      });
+      const { error } = await supabase
+        .from('contacts')
+        .insert([
+          {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            email: formData.email,
+            message: formData.message
+          }
+        ]);
 
-      const result = await response.json();
-      if (result.success) {
+      if (!error) {
         setStatus('success');
         setFormData({ firstName: '', lastName: '', email: '', message: '' });
       } else {
-        throw new Error(result.message);
+        throw error;
       }
     } catch (err) {
-      console.error('Submission error:', err);
+      console.error('Supabase submission detail:', err);
       setStatus('error');
     } finally {
       setIsSubmitting(false);
@@ -254,6 +253,20 @@ export default function Home() {
         ease: 'none'
       });
 
+      // Capabilities Text Reveal
+      const capabilitiesSplit = new SplitType('#capabilities-text', { types: 'words' });
+      gsap.from(capabilitiesSplit.words, {
+        scrollTrigger: {
+          trigger: '#capabilities',
+          start: 'top 75%',
+        },
+        y: 40,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.02,
+        ease: 'power3.out'
+      });
+
     }, containerRef);
     return () => ctx.revert();
   }, []);
@@ -266,7 +279,7 @@ export default function Home() {
       {/* Navigation */}
       <header className="sticky-nav" style={{ position: 'fixed', top: 0, left: 0, width: '100%', padding: '1.5rem 0' }}>
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span className="label" style={{ fontWeight: 900, color: 'var(--text-primary)' }}>(METEORIC)</span>
+          <img src="/images/blume-logo.png" alt="blume" style={{ height: '48px', objectFit: 'contain' }} />
           <div style={{ display: 'flex', gap: '3rem' }}>
             <a href="#capabilities" className="label interactive">(Capabilities)</a>
             <a href="#works" className="label interactive">(Works)</a>
@@ -275,39 +288,88 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="section" style={{ paddingTop: '12rem' }}>
-        <motion.h1 
-          className="hero-text"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 2 }}
+      {/* Hero Section - Split Layout */}
+      <section style={{ 
+        paddingTop: '12rem',
+        paddingBottom: '6rem',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '4rem',
+        minHeight: '100vh',
+      }}>
+        {/* Left: Text Content */}
+        <div style={{ flex: 1 }}>
+          <motion.h1 
+            className="hero-text"
+            initial={{ opacity: 0, y: 60 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.2, delay: 4, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <motion.span whileHover={{ scale: 1.05, skewX: -5, color: 'var(--accent)' }} transition={{ type: 'spring', stiffness: 300, damping: 10 }} style={{ display: 'inline-block', cursor: 'default' }}>Elevating</motion.span>{' '}
+            <motion.span whileHover={{ scale: 1.05, skewX: -5, color: 'var(--accent)' }} transition={{ type: 'spring', stiffness: 300, damping: 10 }} style={{ display: 'inline-block', cursor: 'default' }}>digital</motion.span><br />
+            <motion.span whileHover={{ scale: 1.05, skewX: -5, color: 'var(--accent)' }} transition={{ type: 'spring', stiffness: 300, damping: 10 }} style={{ display: 'inline-block', cursor: 'default' }}>architecture</motion.span>{' '}
+            <motion.span whileHover={{ scale: 1.05, skewX: -5, color: 'var(--accent)' }} transition={{ type: 'spring', stiffness: 300, damping: 10 }} style={{ display: 'inline-block', cursor: 'default' }}>for</motion.span>{' '}
+            <motion.span whileHover={{ scale: 1.05, skewX: -5, color: 'var(--accent)' }} transition={{ type: 'spring', stiffness: 300, damping: 10 }} style={{ display: 'inline-block', cursor: 'default' }}>the</motion.span><br />
+            <motion.span whileHover={{ scale: 1.05, skewX: -5, color: 'var(--accent)' }} transition={{ type: 'spring', stiffness: 300, damping: 10 }} style={{ display: 'inline-block', cursor: 'default' }}>modern</motion.span>{' '}
+            <motion.span whileHover={{ scale: 1.05, skewX: -5, color: '#1D56CD' }} transition={{ type: 'spring', stiffness: 300, damping: 10 }} style={{ display: 'inline-block', color: 'var(--text-secondary)', cursor: 'default' }}>enterprise.</motion.span>
+          </motion.h1>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 4.5, ease: 'easeOut' }}
+            style={{ marginTop: '3rem' }}
+          >
+            <p className="sub-text" style={{ marginBottom: '3rem' }}>
+              Blume is a high-performance digital growth agency focused on business expansion technology, advanced web development, and AI automation. We build conversion-driven digital ecosystems using modern funnel architecture and behavioral optimization to help businesses attract, engage, and convert their ideal customers efficiently..
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+              {['Business Growth Technology Setup', 'Website Development', 'AI Automation', 'Video creation & editing', 'Google Ads', 'SEO Optimization'].map((tag) => (
+                <span key={tag} className="label interactive" style={{ border: '1px solid rgba(0,0,0,0.1)', padding: '0.4rem 1rem', borderRadius: '100px', transition: 'all 0.3s ease' }}>
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Right: Stacked Videos */}
+        <motion.div
+          initial={{ opacity: 0, x: 60, scale: 0.95 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
+          transition={{ duration: 1.2, delay: 4.2, ease: [0.16, 1, 0.3, 1] }}
+          style={{ flex: '0 0 420px', maxWidth: '420px', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
         >
-          <motion.span whileHover={{ scale: 1.05, skewX: -5, color: 'var(--accent)' }} transition={{ type: 'spring', stiffness: 300, damping: 10 }} style={{ display: 'inline-block', cursor: 'default' }}>Elevating</motion.span>{' '}
-          <motion.span whileHover={{ scale: 1.05, skewX: -5, color: 'var(--accent)' }} transition={{ type: 'spring', stiffness: 300, damping: 10 }} style={{ display: 'inline-block', cursor: 'default' }}>digital</motion.span><br />
-          <motion.span whileHover={{ scale: 1.05, skewX: -5, color: 'var(--accent)' }} transition={{ type: 'spring', stiffness: 300, damping: 10 }} style={{ display: 'inline-block', cursor: 'default' }}>architecture</motion.span>{' '}
-          <motion.span whileHover={{ scale: 1.05, skewX: -5, color: 'var(--accent)' }} transition={{ type: 'spring', stiffness: 300, damping: 10 }} style={{ display: 'inline-block', cursor: 'default' }}>for</motion.span>{' '}
-          <motion.span whileHover={{ scale: 1.05, skewX: -5, color: 'var(--accent)' }} transition={{ type: 'spring', stiffness: 300, damping: 10 }} style={{ display: 'inline-block', cursor: 'default' }}>the</motion.span><br />
-          <motion.span whileHover={{ scale: 1.05, skewX: -5, color: 'var(--accent)' }} transition={{ type: 'spring', stiffness: 300, damping: 10 }} style={{ display: 'inline-block', cursor: 'default' }}>modern</motion.span>{' '}
-          <motion.span whileHover={{ scale: 1.05, skewX: -5, color: '#1D56CD' }} transition={{ type: 'spring', stiffness: 300, damping: 10 }} style={{ display: 'inline-block', color: 'var(--text-secondary)', cursor: 'default' }}>enterprise.</motion.span>
-        </motion.h1>
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 2.5 }}
-        >
-          <p className="sub-text" style={{ marginBottom: '3rem' }}>
-            Meteoric is a premier digital agency directed by Tanishq Dubey. 
-            We specialize in Business Growth Technology, high-performance web development, 
-            and AI automation.
-          </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
-            {['Business Growth Technology Setup', 'Website Development', 'AI Automation', 'Video creation & editing', 'Google Ads', 'SEO Optimization'].map((tag) => (
-              <span key={tag} className="label interactive" style={{ border: '1px solid rgba(0,0,0,0.1)', padding: '0.4rem 1rem', borderRadius: '100px', transition: 'all 0.3s ease' }}>
-                {tag}
-              </span>
-            ))}
-          </div>
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            style={{
+              width: '100%',
+              height: '260px',
+              objectFit: 'cover',
+              borderRadius: '24px',
+              boxShadow: '0 32px 80px -12px rgba(0,0,0,0.25)',
+            }}
+          >
+            <source src="/images/video 1.mp4" type="video/mp4" />
+          </video>
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            style={{
+              width: '100%',
+              height: '260px',
+              objectFit: 'cover',
+              borderRadius: '24px',
+              boxShadow: '0 32px 80px -12px rgba(0,0,0,0.25)',
+            }}
+          >
+            <source src="/images/showcase.mp4" type="video/mp4" />
+          </video>
         </motion.div>
       </section>
 
@@ -325,8 +387,8 @@ export default function Home() {
       {/* Capabilities Section */}
       <section id="capabilities" className="section">
         <SectionHeading>Capabilities</SectionHeading>
-        <div className="sub-text reveal-text" style={{ maxWidth: '1200px', fontSize: '2.5rem', color: 'var(--text-primary)', fontWeight: 500, lineHeight: 1.3 }}>
-          Meteoric delivers enterprise-grade solutions where engineering precision meets modern growth technology. We build scalable digital systems that effortlessly integrate advanced programming architecture with intelligent business automation. From AI-powered infrastructure to conversion-optimized web experiences, every solution is designed to strengthen your online visibility and drive long-term sustainable growth.
+        <div id="capabilities-text" className="sub-text reveal-text" style={{ maxWidth: '1200px', fontSize: '2.5rem', fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontWeight: 400, lineHeight: 1.3 }}>
+          Blume delivers enterprise-grade solutions where engineering precision meets modern growth technology. We build scalable digital systems that effortlessly integrate advanced programming architecture with intelligent business automation. From AI-powered infrastructure to conversion-optimized web experiences, every solution is designed to strengthen your online visibility and drive long-term sustainable growth.
         </div>
       </section>
 
@@ -366,7 +428,7 @@ export default function Home() {
             <div>
               <p className="label" style={{ marginBottom: '2rem', color: 'var(--accent)' }}>THE BRIEF</p>
               <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                In March 2026, Meteoric spearheaded the digital overhaul for Zonatello, 
+                In March 2026, Blume spearheaded the digital overhaul for Zonatello, 
                 a high-end Neapolitan pizzeria. The project was designed to transition 
                 their artisanal physical craft into a dominant digital asset.
               </p>
@@ -547,13 +609,12 @@ export default function Home() {
 
       {/* Contact Section */}
       <section id="contact" className="section">
-        <motion.h1 
+        <h1 
           className="hero-text" 
           style={{ marginBottom: '6rem', letterSpacing: '-0.04em' }}
-          {...fadeInUp}
         >
           Let's <span style={{ color: 'var(--accent)' }}>Connect</span>
-        </motion.h1>
+        </h1>
 
         <div className="contact-layout">
           <div>
@@ -607,8 +668,8 @@ export default function Home() {
                     </p>
                     <button 
                       onClick={() => setStatus('idle')}
-                      className="label interactive"
-                      style={{ marginTop: '2rem', background: 'transparent', border: '1px solid var(--text-primary)', padding: '0.8rem 2rem', borderRadius: '100px' }}
+                      className="label"
+                      style={{ marginTop: '2rem', background: 'transparent', border: '1px solid var(--text-primary)', padding: '0.8rem 2rem', borderRadius: '100px', cursor: 'pointer' }}
                     >
                       Send Another Message
                     </button>
@@ -627,7 +688,7 @@ export default function Home() {
                         <input 
                           type="text" 
                           name="firstName"
-                          className="input-field interactive" 
+                          className="input-field" 
                           placeholder="John" 
                           value={formData.firstName}
                           onChange={handleInputChange}
@@ -638,7 +699,7 @@ export default function Home() {
                         <input 
                           type="text" 
                           name="lastName"
-                          className="input-field interactive" 
+                          className="input-field" 
                           placeholder="Doe" 
                           value={formData.lastName}
                           onChange={handleInputChange}
@@ -651,7 +712,7 @@ export default function Home() {
                       <input 
                         type="email" 
                         name="email"
-                        className="input-field interactive" 
+                        className="input-field" 
                         required 
                         placeholder="john@example.com" 
                         value={formData.email}
@@ -663,7 +724,7 @@ export default function Home() {
                       <label className="form-label">Message (required)</label>
                       <textarea 
                         name="message"
-                        className="input-field interactive" 
+                        className="input-field" 
                         rows={4} 
                         required 
                         placeholder="Tell us about your project..." 
@@ -704,22 +765,75 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Already Late - Pre-footer illustration */}
+      <motion.section 
+        style={{ 
+          padding: '4rem', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between', 
+          gap: '4rem',
+          overflow: 'hidden'
+        }}
+        {...fadeInUp}
+      >
+        <div style={{ flex: 1 }}>
+          <p className="label" style={{ marginBottom: '1rem', color: 'var(--accent)' }}>Don't wait</p>
+          <h2 style={{ 
+            fontFamily: 'var(--font-heading)', 
+            fontSize: 'clamp(3rem, 8vw, 7rem)', 
+            fontWeight: 900, 
+            lineHeight: 1, 
+            letterSpacing: '-0.04em',
+            marginBottom: '2rem'
+          }}>
+            already<br/>late.
+          </h2>
+          <p className="sub-text" style={{ maxWidth: '400px', marginBottom: '3rem' }}>
+            Every day you wait is a day your competitors gain ground. Let's build something remarkable — starting now.
+          </p>
+          <a 
+            href="#contact" 
+            className="label interactive"
+            style={{ 
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              gap: '0.75rem', 
+              background: 'var(--text-primary)', 
+              color: 'var(--bg-color)',
+              padding: '1.2rem 2.5rem', 
+              borderRadius: '100px',
+              fontSize: '1rem',
+              fontWeight: 700,
+              transition: 'all 0.3s ease'
+            }}
+          >
+            Start Now <ArrowUpRight size={20} />
+          </a>
+        </div>
+        <motion.div 
+          style={{ flex: '0 0 400px', maxWidth: '400px' }}
+          initial={{ opacity: 0, x: 60 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.9, ease: 'easeOut' }}
+        >
+          <img 
+            src="/images/already-late.png" 
+            alt="already late illustration" 
+            style={{ width: '100%', height: 'auto', borderRadius: '24px' }}
+          />
+        </motion.div>
+      </motion.section>
+
       {/* Footer */}
       <footer style={{ padding: '8rem 2rem 4rem', background: 'var(--footer-bg)', color: 'var(--footer-text)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '4rem', marginBottom: '6rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '4rem', marginBottom: '6rem' }}>
           <div>
-            <span className="label" style={{ fontSize: '1.5rem', marginBottom: '2rem', display: 'block', color: 'var(--footer-text)', fontWeight: 900 }}>(METEORIC)</span>
+            <img src="/images/blume-logo.png" alt="blume" style={{ height: '40px', objectFit: 'contain', marginBottom: '2rem', display: 'block', filter: 'brightness(0) invert(1)' }} />
             <p className="sub-text" style={{ fontSize: '1.1rem', maxWidth: '300px', color: 'var(--footer-text)', opacity: 0.8 }}>
               Strategic digital architecture and AI automation for the modern enterprise.
             </p>
-          </div>
-          <div>
-            <p className="label" style={{ marginBottom: '1.5rem', color: 'var(--footer-text)' }}>Connect</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <a href="#" className="label interactive" style={{ opacity: 0.8, color: 'var(--footer-text)' }}>(LinkedIn)</a>
-              <a href="#" className="label interactive" style={{ opacity: 0.8, color: 'var(--footer-text)' }}>(Instagram)</a>
-              <a href="#" className="label interactive" style={{ opacity: 0.8, color: 'var(--footer-text)' }}>(GitHub)</a>
-            </div>
           </div>
           <div>
             <p className="label" style={{ marginBottom: '1.5rem', color: 'var(--footer-text)' }}>Contact</p>
@@ -730,7 +844,7 @@ export default function Home() {
           </div>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(254,248,242,0.2)', paddingTop: '4rem' }}>
-          <span className="label" style={{ color: 'var(--footer-text)' }}>&copy; 2026 METEORIC DIGITAL AGENCY</span>
+          <span className="label" style={{ color: 'var(--footer-text)' }}>&copy; 2026 BLUME DIGITAL AGENCY</span>
           <a href="#" className="label interactive" onClick={(e) => { e.preventDefault(); window.scrollTo({top: 0, behavior: 'smooth'}); }} style={{ color: 'var(--footer-text)' }}>BACK TO TOP ↑</a>
         </div>
       </footer>

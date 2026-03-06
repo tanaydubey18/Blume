@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700;900&display=swap');
 
 :root {
-  --bg-color: #fbfbfe;
+  --bg-color: #FFFFFF;
   --text-primary: #0f172a;
   --text-secondary: #64748b;
   --accent: #e11d48; /* Meteoric Red */
@@ -182,14 +182,14 @@ a {
 }
 
 .submit-btn:hover, .interactive:hover {
-  opacity: 1; /* Override default opacity shifts */
-  animation: wavyHover 0.6s ease-in-out infinite;
-  display: inline-block; /* Ensure transforms apply smoothly */
+  opacity: 1;
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
 }
 
-/* Ensure the header link block hover wavy effect doesn't break layout */
+/* Ensure the header link block hover effect doesn't break layout */
 header .interactive:hover {
-  animation: wavyHover 0.6s ease-in-out infinite;
+  transform: translateY(-2px);
 }
 /* Sticky Header Customization */
 .sticky-nav {
