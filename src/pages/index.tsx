@@ -621,8 +621,8 @@ export default function Home() {
           <div>
             <div style={{ marginBottom: '4rem' }}>
               <p className="label" style={{ marginBottom: '1.5rem', color: 'var(--accent)' }}>Email & Inquiries</p>
-              <a href="mailto:meteoric.works@gmail.com" className="sub-text interactive" style={{ fontSize: '1.4rem', textDecoration: 'none', fontWeight: 600 }}>
-                meteoric.works@gmail.com
+              <a href="mailto:hello@blume.works" className="sub-text interactive" style={{ fontSize: '1.4rem', textDecoration: 'none', fontWeight: 600 }}>
+                hello@blume.works
               </a>
             </div>
             
@@ -839,7 +839,7 @@ export default function Home() {
           <div>
             <p className="label" style={{ marginBottom: '1.5rem', color: 'var(--footer-text)' }}>Contact</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <a href="mailto:meteoric.works@gmail.com" className="label interactive" style={{ opacity: 0.8, color: 'var(--footer-text)' }}>meteoric.works@gmail.com</a>
+              <a href="mailto:hello@blume.works" className="label interactive" style={{ opacity: 0.8, color: 'var(--footer-text)' }}>hello@blume.works</a>
               <a href="tel:+919109794933" className="label interactive" style={{ opacity: 0.8, color: 'var(--footer-text)' }}>+91 9109794933</a>
             </div>
           </div>
